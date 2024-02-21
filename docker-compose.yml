@@ -1,0 +1,36 @@
+version: '3'
+networks:
+  mynetwork:
+    driver: bridge
+services:
+  api:
+    image: jaidsondantas/api-amor-saude
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+    command: [
+        '/bin/bash',
+        '-c',
+        # 'npm install && npx prisma generate && npm run build && npm run migration && npm run seed && npm run start:prod',
+        'npm cache clean --force npm install && npx prisma generate && npm run build && npm run migration && npm run seed && npm run start',
+      ]
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: db_amor_saude
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./:/usr/app
+    networks:
+      - mynetwork

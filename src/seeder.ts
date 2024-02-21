@@ -1,15 +1,10 @@
-import {seeder} from "nestjs-seeder";
-import {PrismaService} from 'src/shared/services/prisma.service';
-import {SharedModule} from 'src/shared/shared.module';
-import {UserSeeder} from 'src/database/seeders/user.seeder';
-import {UsersService} from 'src/main/users/users.service';
+import { seeder } from 'nestjs-seeder';
+import { SharedModule } from './shared/shared.module';
+import { PrismaService } from './shared/services/prisma.service';
+import { UserSeeder } from './database/seeders/user.seeder';
+import { RegionSeeder } from './database/seeders/regions.seeder';
 
 seeder({
   imports: [SharedModule],
-  providers: [
-    PrismaService,
-    UsersService
-  ]
-}).run([
-  UserSeeder,
-]);
+  providers: [PrismaService],
+}).run([UserSeeder, RegionSeeder]);

@@ -1,5 +1,5 @@
-import {DateAt} from "./date-at";
+import { DateAt } from './date-at';
 
 export class Common extends DateAt {
-  id: string
+  id: string;
 }

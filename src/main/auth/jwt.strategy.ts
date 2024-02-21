@@ -4,11 +4,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
-import { UserRepository } from '../users/user.repository';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private userRepository: UserRepository) {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -17,18 +20,30 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    if (!payload) {
+    if (!payload || !payload.sub) {
       throw new HttpException(
         {
           status: HttpStatus.UNAUTHORIZED,
-          error: 'email ou senha incorretos, digite novamente!',
+          error: 'Invalid payload or missing sub property',
         },
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    return await this.userRepository.findOneBy({
+    const user = await this.userRepository.findOneBy({
       id: payload.sub,
     });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: 'User not found for the given payload',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return user;
   }
 }

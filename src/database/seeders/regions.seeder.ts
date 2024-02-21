@@ -1,27 +1,46 @@
 import { Seeder } from 'nestjs-seeder';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
-import { CreateUserDto } from 'src/main/users/dto/create-user.dto';
+import { CreateRegionDto } from '../../main/companies/dto/region.dto';
 
 @Injectable()
-export class UserSeeder implements Seeder {
+export class RegionSeeder implements Seeder {
   constructor(private prisma: PrismaService) {}
 
   async seed(): Promise<any> {
-    if (!(await this.prisma.seeds.count({ where: { key: 'UserSeeder' } }))) {
-      const _user: CreateUserDto = {
-        name: 'Usuário Teste',
-        email: 'usuarioteste@gmail.com',
-        password: '123',
-      };
+    if (!(await this.prisma.seeds.count({ where: { key: 'RegionSeeder' } }))) {
+      const regionsRaw = [
+        { label: 'Alto tietê' },
+        { label: 'Interior' },
+        { label: 'ES' },
+        { label: 'SP Interior' },
+        { label: 'SP' },
+        { label: 'SP2' },
+        { label: 'MG' },
+        { label: 'Nacional' },
+        { label: 'SP CAV' },
+        { label: 'RJ' },
+        { label: 'SP2' },
+        { label: 'SP1' },
+        { label: 'NE1' },
+        { label: 'NE2' },
+        { label: 'SUL' },
+        { label: 'Norte' },
+      ];
 
-      await this.prisma.users.create({
-        data: _user,
+      const _regions: CreateRegionDto[] = regionsRaw.map((r) => {
+        return {
+          name: r.label,
+        };
+      });
+
+      await this.prisma.regions.createMany({
+        data: _regions,
       });
 
       await this.prisma.seeds.create({
         data: {
-          key: 'UserSeeder',
+          key: 'RegionsSeeder',
         },
       });
     }

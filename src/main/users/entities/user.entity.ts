@@ -1,9 +1,8 @@
-import { DateAt } from 'src/shared/models/date-at';
 import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('db_users')
-export class User extends DateAt {
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn()
   id?: number;
 
@@ -16,12 +15,4 @@ export class User extends DateAt {
   @Exclude()
   @Column()
   password?: string;
-
-  @Column()
-  salt?: string;
-
-  constructor() {
-    super();
-    Object.assign(this, null);
-  }
 }

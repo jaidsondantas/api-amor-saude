@@ -1,4 +1,8 @@
 export interface Pagination {
-  skip?: number;
-  take?: number;
+  size?: number;
+  page?: number;
+}
+
+export interface Total {
+  total: number;
 }

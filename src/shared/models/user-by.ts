@@ -1,7 +1,7 @@
-import {User} from 'src/main/users/entities/user.entity';
-import {Id} from "./id";
+import { Id } from './id';
+import { User } from '../../main/users/entities/user.entity';
 
 export class UsersBy extends Id {
-    createdBy: User
-    updatedBy: User
+  createdBy: User;
+  updatedBy: User;
 }

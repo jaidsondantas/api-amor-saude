@@ -1,33 +1,32 @@
-import { HttpException, HttpStatus, Injectable, Scope } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { GenerateHash } from 'src/shared/helpers/generate-hash';
 import { User } from './entities/user.entity';
-import { UserRepository } from './user.repository';
 
-@Injectable({
-  scope: Scope.DEFAULT,
-})
+@Injectable()
 export class UsersService {
   private readonly _saltOrRounds = 10;
 
   constructor(
-    private generateHash: GenerateHash,
-    private readonly userRepository: UserRepository,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const _user = await this.prepare(createUserDto);
+    const preparedUser = await this.prepare(createUserDto);
 
     try {
-      const user: User = this.userRepository.create(_user)[0];
-      return this.userRepository.save(user);
-    } catch (e) {
-      console.log(e);
+      const user = this.userRepository.create(preparedUser);
+      const savedUser = await this.userRepository.save(user);
+      return savedUser;
+    } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
-          error: e.message,
+          error: error.message,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -43,15 +42,10 @@ export class UsersService {
   }
 
   async prepare(user: CreateUserDto | UpdateUserDto): Promise<Partial<User>> {
-    const saltOrRounds = this._saltOrRounds;
     const _user: Partial<User> = {
       name: user.name,
       email: user.email,
-      password: await this.generateHash.generateHash(
-        user.password,
-        saltOrRounds,
-      ),
-      salt: await this.generateHash.genSalt(),
+      password: user.password,
     };
     return _user;
   }
